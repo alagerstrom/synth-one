@@ -8,6 +8,8 @@
 #include "EnvelopeGenerator.h"
 #include "MidiReceiver.h"
 #include "EnvelopeModule.h"
+#include "FilterModule.h"
+#include "LFOModule.h"
 
 class SynthOne : public IPlug {
 public:
@@ -43,6 +45,7 @@ private:
         decayParameter,
         sustainParameter,
         releaseParameter,
+        ampEnvelopeAmountParameter,
         filterModeParameter,
         filterCutoffParameter,
         filterResonanceParameter,
@@ -51,10 +54,11 @@ private:
         filterSustainParameter,
         filterReleaseParameter,
         filterEnvelopeAmountParameter,
+        lfoFreqParam,
+        lfoModeParam,
+        lfoAmountParam,
         numberOfParameters
     };
-    double filterEnvelopeAmount;
-    Filter filter;
     MidiReceiver midiReceiver;
 
     void onNoteOn(int noteNumber, int velocity) {
@@ -71,6 +75,8 @@ private:
     OscillatorModule oscillator3;
     EnvelopeModule ampEnvelopeModule;
     EnvelopeModule filterEnvelopeModule;
+    FilterModule filterModule;
+    LFOModule lfoModule;
     void createKnob(int x, int y, IGraphics *pGraphics, int param);
 };
 

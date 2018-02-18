@@ -41,8 +41,6 @@ public:
 
     void setPlayedNote(int noteNumber);
 
-    double nextSample();
-
     void setSampleRate(double sampleRate);
 
     void setMode(OscillatorMode mode);
@@ -54,6 +52,10 @@ public:
     void setTune(double tune);
 
     void handleParamChange(int paramNumber);
+
+    void advance();
+
+    double getSample();
 };
 
 

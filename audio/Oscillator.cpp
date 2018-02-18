@@ -28,12 +28,6 @@ void Oscillator::incrementPhase() {
     }
 }
 
-double Oscillator::nextSample() {
-    double value = naiveWaveformForMode(oscillatorMode);
-    incrementPhase();
-    return value;
-}
-
 double Oscillator::naiveWaveformForMode(OscillatorMode mode) {
     double value = 0.0;
     switch (mode) {
@@ -58,4 +52,12 @@ double Oscillator::naiveWaveformForMode(OscillatorMode mode) {
             break;
     }
     return value;
+}
+
+double Oscillator::getSample() {
+    return naiveWaveformForMode(oscillatorMode);
+}
+
+void Oscillator::advance() {
+    incrementPhase();
 }

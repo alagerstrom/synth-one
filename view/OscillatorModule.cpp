@@ -44,6 +44,10 @@ void OscillatorModule::handleParamChange(int paramIndex) {
     oscillatorController.handleParamChange(paramIndex);
 }
 
-double OscillatorModule::nextSample() {
-    return oscillatorController.nextSample();
+void OscillatorModule::advance() {
+    oscillatorController.advance();
+}
+
+double OscillatorModule::getSample() {
+    return oscillatorController.getSample();
 }

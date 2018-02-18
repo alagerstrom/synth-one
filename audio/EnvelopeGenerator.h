@@ -49,6 +49,10 @@ public:
         stageValue[ENVELOPE_STAGE_RELEASE] = 1.0;
     }
 
+    void advance();
+
+    double getSample();
+
 private:
     EnvelopeStage currentStage;
     double currentLevel;

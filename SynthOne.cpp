@@ -11,29 +11,11 @@ SynthOne::SynthOne(IPlugInstanceInfo instanceInfo)
           oscillator1(this, 100, 100, 100, osc1WaveParam, osc1FreqParam, osc1OctaveParam, osc1SemiParam),
           oscillator2(this, 100, 200, 100, osc2WaveParam, osc2FreqParam, osc2OctaveParam, osc2SemiParam),
           oscillator3(this, 100, 300, 100, osc3WaveParam, osc3FreqParam, osc3OctaveParam, osc3SemiParam),
-          ampEnvelopeModule(this, 100, 400, 100, attackParameter, decayParameter, sustainParameter, releaseParameter),
-          filterEnvelopeModule(this, 100, 600, 100, filterAttackParameter, filterDecayParameter, filterSustainParameter, filterReleaseParameter) {
+          ampEnvelopeModule(this, 100, 400, 100, attackParameter, decayParameter, sustainParameter, releaseParameter, ampEnvelopeAmountParameter),
+          filterEnvelopeModule(this, 100, 500, 100, filterAttackParameter, filterDecayParameter, filterSustainParameter, filterReleaseParameter, filterEnvelopeAmountParameter),
+          filterModule(this, 100, 600, 100, filterCutoffParameter, filterResonanceParameter, filterModeParameter),
+          lfoModule(this, 100, 700, 100, lfoFreqParam, lfoModeParam, lfoAmountParam) {
     TRACE;
-
-    //arguments are: name, defaultVal, minVal, maxVal, step, label
-
-
-
-    GetParam(filterModeParameter)->InitEnum("Filter mode", Filter::FILTER_MODE_LOWPASS, Filter::numberOfFilterModes);
-    GetParam(filterCutoffParameter)->InitDouble("Cutoff", 0.99, 0.01, 0.99, 0.001);
-    GetParam(filterCutoffParameter)->SetShape(2);
-    GetParam(filterResonanceParameter)->InitDouble("Resonance", 0.01, 0.01, 1.0, 0.001);
-    GetParam(filterAttackParameter)->InitDouble("Filter Env Attack", 0.01, 0.01, 10.0, 0.001);
-    GetParam(filterAttackParameter)->SetShape(3);
-    GetParam(filterDecayParameter)->InitDouble("Filter Env Decay", 0.5, 0.01, 15.0, 0.001);
-    GetParam(filterDecayParameter)->SetShape(3);
-    GetParam(filterSustainParameter)->InitDouble("Filter Env Sustain", 0.1, 0.001, 1.0, 0.001);
-    GetParam(filterSustainParameter)->SetShape(2);
-    GetParam(filterReleaseParameter)->InitDouble("Filter Env Release", 1.0, 0.001, 15.0, 0.001);
-    GetParam(filterReleaseParameter)->SetShape(3);
-    GetParam(filterEnvelopeAmountParameter)->InitDouble("Filter Env Amount", 0.0, -1.0, 1.0, 0.001);
-
-
     IGraphics *pGraphics = MakeGraphics(this, GUI_WIDTH, GUI_HEIGHT);
     pGraphics->AttachBackground(PANEL_ID, PANEL_FN);
     IBitmap knob = pGraphics->LoadIBitmap(KNOB_ID, KNOB_FN, 128);
@@ -47,29 +29,26 @@ SynthOne::SynthOne(IPlugInstanceInfo instanceInfo)
     oscillator3.initializeParameters("Osc 3 Frequency", "Osc 3 Waveform", "Osc 3 Octave", "Osc 3 Semitone");
     oscillator3.draw(pGraphics, &knob);
 
-    ampEnvelopeModule.initializeParameters("Amp Attack", "Amp Decay", "Amp Sustain", "Amp Release");
+    ampEnvelopeModule.initializeParameters("Amp Attack", "Amp Decay", "Amp Sustain", "Amp Release", "Amp Envelope Amount");
     ampEnvelopeModule.draw(pGraphics, &knob);
 
-    filterEnvelopeModule.initializeParameters("Filter Attack", "Filter Decay", "Filter Sustain", "Filter Release");
+    filterEnvelopeModule.initializeParameters("Filter Attack", "Filter Decay", "Filter Sustain", "Filter Release", "Filter Envelope Amount");
     filterEnvelopeModule.draw(pGraphics, &knob);
 
+    filterModule.initializeParameters("Cutoff", "Resonance", "Filter Mode");
+    filterModule.draw(pGraphics, &knob);
+    filterModule.addInputModule(&oscillator1);
+    filterModule.addInputModule(&oscillator2);
+    filterModule.addInputModule(&oscillator3);
 
-    int filterY = 500;
-    int filterDistance = 100;
-    int firstFilterX = 100;
-
-    createKnob(firstFilterX, filterY, pGraphics, filterModeParameter);
-    createKnob(firstFilterX + filterDistance, filterY, pGraphics, filterCutoffParameter);
-    createKnob(firstFilterX + 2 * filterDistance, filterY, pGraphics, filterResonanceParameter);
-
-    createKnob(500, 600, pGraphics, filterEnvelopeAmountParameter);
-
-
-    AttachGraphics(pGraphics);
+    lfoModule.initializeParameters("LFO Frequency", "LFO Mode", "LFO Level");
+    lfoModule.draw(pGraphics, &knob);
+    filterModule.setModulator(&lfoModule);
 
     midiReceiver.noteOn.Connect(this, &SynthOne::onNoteOn);
     midiReceiver.noteOff.Connect(this, &SynthOne::onNoteOff);
 
+    AttachGraphics(pGraphics);
     MakeDefaultPreset("clean", numberOfParameters);
 }
 
@@ -85,8 +64,13 @@ void SynthOne::ProcessDoubleReplacing(double **inputs, double **outputs, int nFr
         oscillator1.setPlayedNote(midiReceiver.getLastNoteNumber());
         oscillator2.setPlayedNote(midiReceiver.getLastNoteNumber());
         oscillator3.setPlayedNote(midiReceiver.getLastNoteNumber());
-        filter.setModulation(filterEnvelopeModule.nextSample() * filterEnvelopeAmount);
-        leftOutput[i] = rightOutput[i] = filter.process((oscillator1.nextSample() + oscillator2.nextSample() + oscillator3.nextSample()) / 3 * ampEnvelopeModule.nextSample());
+        oscillator1.advance();
+        oscillator2.advance();
+        oscillator3.advance();
+        filterEnvelopeModule.advance();
+        ampEnvelopeModule.advance();
+        lfoModule.advance();
+        leftOutput[i] = rightOutput[i] = filterModule.getSample() * ampEnvelopeModule.getSample();
     }
     midiReceiver.flush(nFrames);
 }
@@ -109,22 +93,9 @@ void SynthOne::OnParamChange(int paramIdx) {
     oscillator3.handleParamChange(paramIdx);
     ampEnvelopeModule.handleParamChange(paramIdx);
     filterEnvelopeModule.handleParamChange(paramIdx);
-    switch (paramIdx) {
-        case filterEnvelopeAmountParameter:
-            this->filterEnvelopeAmount = GetParam(filterEnvelopeAmountParameter)->Value();
-            break;
-        case filterCutoffParameter:
-            filter.setCutoff(GetParam(paramIdx)->Value());
-            break;
-        case filterResonanceParameter:
-            filter.setResonance(GetParam(paramIdx)->Value());
-            break;
-        case filterModeParameter:
-            filter.setFilterMode(static_cast<Filter::FilterMode>(GetParam(paramIdx)->Int()));
-            break;
-        default:
-            break;
-    }
+    filterModule.handleParamChange(paramIdx);
+    lfoModule.handleParamChange(paramIdx);
+
 }
 
 void SynthOne::ProcessMidiMsg(IMidiMsg *pMsg) {

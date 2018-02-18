@@ -10,9 +10,9 @@
 #include "IPlug_include_in_plug_hdr.h"
 #include "EnvelopeGenerator.h"
 
-class EnvelopeModule : public AbstractModule{
+class EnvelopeModule : public AbstractModule {
 private:
-    IPlug * iPlug;
+    IPlug *iPlug;
     int x;
     int y;
     int spacing;
@@ -20,24 +20,38 @@ private:
     int decayParameter;
     int sustainParameter;
     int releaseParameter;
+    int amountParameter;
     EnvelopeGenerator envelopeGenerator;
+    double amountValue = 0;
 
 
 public:
-    EnvelopeModule(IPlug *iPlug, int x, int y, int spacing, int attackParameter, int decayParameter, int sustainParameter, int releaseParameter);
+    EnvelopeModule(
+            IPlug *iPlug,
+            int x,
+            int y,
+            int spacing,
+            int attackParameter,
+            int decayParameter,
+            int sustainParameter,
+            int releaseParameter,
+            int amountParameter
+    );
 
 public:
     void draw(IGraphics *iGraphics, IBitmap *knob) override;
 
     void handleParamChange(int paramIndex) override;
 
-    void initializeParameters(const char * attackName, const char * decayName, const char * sustainName, const char * releaseName);
+    void initializeParameters(const char *attackName, const char *decayName, const char *sustainName, const char *releaseName, const char* amountName);
 
     void enterStage(EnvelopeGenerator::EnvelopeStage stage);
 
-    double nextSample();
-
     void setSampleRate(double rate);
+
+    void advance() override;
+
+    double getSample() override;
 };
 
 

@@ -13,6 +13,8 @@ class AbstractModule {
 public:
     virtual void draw(IGraphics * iGraphics, IBitmap * knob) = 0;
     virtual void handleParamChange(int paramIndex) = 0;
+    virtual void advance() = 0;
+    virtual double getSample() = 0;
 };
 
 

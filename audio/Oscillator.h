@@ -46,7 +46,8 @@ public:
         updateIncrement();
     }
 
-    virtual double nextSample();
+    virtual double getSample();
+    virtual void advance();
 
     double naiveWaveformForMode(OscillatorMode mode);
 

@@ -26,9 +26,9 @@ private:
 public:
 
 
-    void draw(IGraphics *iGraphics, IBitmap *knob);
+    void draw(IGraphics *iGraphics, IBitmap *knob) override;
 
-    void handleParamChange(int paramIndex);
+    void handleParamChange(int paramIndex) override;
 
     OscillatorModule(IPlug *iPlug, int x, int y, int spacing, int modeParameter, int tuneParameter, int octaveParameter, int semitoneParameter);
 
@@ -38,7 +38,9 @@ public:
 
     void setSampleRate(double rate);
 
-    double nextSample();
+    void advance() override;
+
+    double getSample() override;
 };
 
 

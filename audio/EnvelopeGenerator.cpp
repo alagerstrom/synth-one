@@ -6,18 +6,7 @@
 #include "EnvelopeGenerator.h"
 
 double EnvelopeGenerator::nextSample() {
-    if (currentStage != ENVELOPE_STAGE_OFF &&
-            currentStage != ENVELOPE_STAGE_SUSTAIN) {
-        if (currentSampleIndex == nextStageSampleIndex) {
-            EnvelopeStage newStage = static_cast<EnvelopeStage>(
-                    (currentStage + 1) % kNumEnvelopeStages
-            );
-            enterStage(newStage);
-        }
-        currentLevel *= multiplier;
-        currentSampleIndex++;
-    }
-    return currentLevel;
+
 }
 
 void EnvelopeGenerator::calculateMultiplier(double startLevel,
@@ -106,4 +95,22 @@ void EnvelopeGenerator::setStageValue(EnvelopeStage stage,
                 fmax(stageValue[ENVELOPE_STAGE_SUSTAIN], minimumLevel),
                 samplesUntilNextStage);
     }
+}
+
+void EnvelopeGenerator::advance() {
+    if (currentStage != ENVELOPE_STAGE_OFF &&
+            currentStage != ENVELOPE_STAGE_SUSTAIN) {
+        if (currentSampleIndex == nextStageSampleIndex) {
+            EnvelopeStage newStage = static_cast<EnvelopeStage>(
+                    (currentStage + 1) % kNumEnvelopeStages
+            );
+            enterStage(newStage);
+        }
+        currentLevel *= multiplier;
+        currentSampleIndex++;
+    }
+}
+
+double EnvelopeGenerator::getSample() {
+    return currentLevel;
 }

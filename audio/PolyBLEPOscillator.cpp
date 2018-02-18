@@ -23,7 +23,7 @@ double PolyBLEPOscillator::polyBlep(double t) {
     else return 0.0;
 }
 
-double PolyBLEPOscillator::nextSample() {
+double PolyBLEPOscillator::getSample() {
     double value = 0.0;
     double t = phase / twoPi;
 
@@ -43,6 +43,11 @@ double PolyBLEPOscillator::nextSample() {
             lastOutput = value;
         }
     }
-    incrementPhase();
     return value;
 }
+
+void PolyBLEPOscillator::advance() {
+    incrementPhase();
+}
+
+

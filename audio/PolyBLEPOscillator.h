@@ -8,15 +8,19 @@
 
 #include "Oscillator.h"
 
-class PolyBLEPOscillator : public Oscillator{
+class PolyBLEPOscillator : public Oscillator {
 public:
-    PolyBLEPOscillator() : lastOutput(0.0){
+    PolyBLEPOscillator() : lastOutput(0.0) {
         updateIncrement();
     };
-    double nextSample();
+
+    double getSample();
+
+    void advance();
 
 private:
     double polyBlep(double t);
+
     double lastOutput;
 };
 
