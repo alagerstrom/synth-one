@@ -70,7 +70,7 @@ instrument determined by PLUG _IS _INST
 #define PANEL_FN "resources/img/panel.png"
 
 // GUI default dimensions
-#define GUI_WIDTH 600
+#define GUI_WIDTH 1000
 #define GUI_HEIGHT 1000
 
 // on MSVC, you must define SA_API in the resource editor preprocessor macros as well as the c++ ones

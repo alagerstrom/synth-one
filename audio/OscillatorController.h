@@ -22,6 +22,8 @@ private:
     const int waveParam;
     const int octParam;
     const int semiParam;
+    double currentFrequency = 440.0;
+    double portamento = 0.01;
 
     double noteNumberToFrequency(int noteNumber);
 
@@ -56,6 +58,9 @@ public:
     void advance();
 
     double getSample();
+
+    void setPortamento(double portamento);
+
 };
 
 

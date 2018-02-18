@@ -25,7 +25,18 @@ void OscillatorController::setPlayedNote(int noteNumber) {
     if (noteNumber != -1) {
         this->playedNote = noteNumber;
         int noteNumberWithOctaveAndSemitone = noteNumber + 12 * octave + semitone;
-        oscillator.setFrequency(tune * noteNumberToFrequency(noteNumberWithOctaveAndSemitone));
+        double frequencyTarget = tune * noteNumberToFrequency(noteNumberWithOctaveAndSemitone);
+        if (currentFrequency < frequencyTarget){
+            currentFrequency *= (1 + portamento);
+            if (currentFrequency > frequencyTarget)
+                currentFrequency = frequencyTarget;
+        }
+        else if (currentFrequency > frequencyTarget){
+            currentFrequency *= (1 - portamento);
+            if (currentFrequency < frequencyTarget)
+                currentFrequency = frequencyTarget;
+        }
+        oscillator.setFrequency(currentFrequency);
     }
 }
 
@@ -59,4 +70,8 @@ void OscillatorController::advance() {
 
 double OscillatorController::getSample() {
     return oscillator.getSample();
+}
+
+void OscillatorController::setPortamento(double portamento) {
+    this->portamento = portamento;
 }

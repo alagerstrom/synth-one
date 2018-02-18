@@ -51,3 +51,8 @@ void OscillatorModule::advance() {
 double OscillatorModule::getSample() {
     return oscillatorController.getSample();
 }
+
+void OscillatorModule::setPortamento(double portamento) {
+    oscillatorController.setPortamento(portamento);
+}
+

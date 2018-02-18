@@ -25,7 +25,7 @@ void FilterModule::advance() {
 }
 
 double FilterModule::getSample() {
-    filter.setModulation(modulator->getSample());
+    filter.setModulation(sumModulation());
     double value = 0;
     for (unsigned long i = 0; i < inputModules.size(); i++){
         AbstractModule *module = inputModules.at(i);
@@ -50,6 +50,14 @@ void FilterModule::addInputModule(AbstractModule * module) {
     inputModules.push_back(module);
 }
 
-void FilterModule::setModulator(AbstractModule *module) {
-    this->modulator = module;
+void FilterModule::addModulator(AbstractModule *module) {
+    modulators.push_back(module);
+}
+
+double FilterModule::sumModulation() {
+    double modulation = 0.0;
+    for (unsigned long i = 0; i < modulators.size(); i++){
+        modulation += modulators.at(i)->getSample() / modulators.size();
+    }
+    return modulation;
 }

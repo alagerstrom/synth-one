@@ -26,11 +26,11 @@ void EnvelopeGenerator::enterStage(EnvelopeStage newStage) {
     }
     switch (newStage){
         case ENVELOPE_STAGE_OFF:
-            currentLevel = 0.0;
+            currentLevel = minimumLevel;
             multiplier = 1.0;
             break;
         case ENVELOPE_STAGE_ATTACK:
-            currentLevel = minimumLevel;
+//            currentLevel = minimumLevel;
             calculateMultiplier(currentLevel, 1.0, nextStageSampleIndex);
             break;
         case ENVELOPE_STAGE_DECAY:

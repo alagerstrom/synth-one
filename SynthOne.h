@@ -57,6 +57,10 @@ private:
         lfoFreqParam,
         lfoModeParam,
         lfoAmountParam,
+        secondLfoFreqParam,
+        secondLfoModeParam,
+        secondLfoAmountParam,
+        portamentoParam,
         numberOfParameters
     };
     MidiReceiver midiReceiver;
@@ -70,14 +74,15 @@ private:
         ampEnvelopeModule.enterStage(EnvelopeGenerator::ENVELOPE_STAGE_RELEASE);
         filterEnvelopeModule.enterStage(EnvelopeGenerator::ENVELOPE_STAGE_RELEASE);
     };
+    double portamento;
     OscillatorModule oscillator1;
     OscillatorModule oscillator2;
     OscillatorModule oscillator3;
     EnvelopeModule ampEnvelopeModule;
     EnvelopeModule filterEnvelopeModule;
     FilterModule filterModule;
-    LFOModule lfoModule;
-    void createKnob(int x, int y, IGraphics *pGraphics, int param);
+    LFOModule lfo1;
+    LFOModule lfo2;
 };
 
 #endif

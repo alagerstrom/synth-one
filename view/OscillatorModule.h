@@ -41,6 +41,8 @@ public:
     void advance() override;
 
     double getSample() override;
+
+    void setPortamento(double portamento);
 };
 
 

@@ -21,8 +21,10 @@ private:
     int resonanceParam;
     int modeParam;
     Filter filter;
-    AbstractModule * modulator;
+    std::vector<AbstractModule *> modulators;
     std::vector<AbstractModule *> inputModules;
+
+    double sumModulation();
 
 public:
 
@@ -44,7 +46,7 @@ public:
 
     double getSample() override;
 
-    void setModulator(AbstractModule *module);
+    void addModulator(AbstractModule *module);
 };
 
 
